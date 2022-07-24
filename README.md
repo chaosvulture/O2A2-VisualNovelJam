@@ -1,4 +1,4 @@
-# O2A2--VisualNovelJam
+# O2A2-VisualNovelJam
 
 **Download and install Github Desktop: https://desktop.github.com/**
 
