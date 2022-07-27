@@ -8,6 +8,8 @@ public class DialogueManager : MonoBehaviour
     public TextMeshProUGUI itemNameText;
     public TextMeshProUGUI dialogueText;
 
+    public float typeSpeed;
+
     public Animator animator;
     
     private Queue<string> sentences;
@@ -15,6 +17,14 @@ public class DialogueManager : MonoBehaviour
     private void Awake()
     {
         sentences = new Queue<string>();
+    }
+
+    private void Update()
+    {
+        if (Input.GetMouseButtonDown(0))
+        {
+            DisplayNextSentence();
+        }
     }
 
     public void StartDialogue(Dialogue dialogue)
@@ -30,20 +40,26 @@ public class DialogueManager : MonoBehaviour
             sentences.Enqueue(sentence);
         }
 
+
         DisplayNextSentence();
+        SoundManager.instance.PlayVoiceOverSound(dialogue.audioClips[0]);
     }
 
     public void DisplayNextSentence()
     {
-        if (sentences.Count == 0)
-        {
-            EndDialogue();
-            return;
-        }
+            if (sentences.Count == 0)
+            {
+                EndDialogue();
+                return;
+            }
 
-        string sentence = sentences.Dequeue();
-        StopAllCoroutines();
-        StartCoroutine(TypeSentece(sentence));
+            string sentence = sentences.Dequeue();
+            StopAllCoroutines();
+            StartCoroutine(TypeSentece(sentence));
+
+        SoundManager.instance._voiceOverSource.Stop();
+
+        // need to build a function that plays the audio + adds +1 to the array to play the next audio
     }
 
     IEnumerator TypeSentece(string sentence)
@@ -52,7 +68,7 @@ public class DialogueManager : MonoBehaviour
         foreach (char letter in sentence.ToCharArray())
         {
             dialogueText.text += letter;
-            yield return null;
+            yield return new WaitForSeconds(typeSpeed);
         }
     }
 
