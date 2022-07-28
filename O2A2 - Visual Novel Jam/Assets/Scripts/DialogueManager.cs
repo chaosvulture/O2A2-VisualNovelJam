@@ -6,19 +6,24 @@ using TMPro;
 public class DialogueManager : MonoBehaviour
 {
     public TextMeshProUGUI itemNameText;
-    public TextMeshProUGUI dialogueText;
+    public TMP_Text textBox;
 
-    public float typeSpeed;
 
-    public Animator animator;
+    FadeUI _fadeUI;
 
-    private int index; 
+    int index = 0;
+
+    private Dialogue _dialogue;
     
     private Queue<string> sentences;
 
+    private DialogueVertexAnimator dialogueVertexAnimator;
+
     private void Awake()
     {
+        dialogueVertexAnimator = new DialogueVertexAnimator(textBox);
         sentences = new Queue<string>();
+        _fadeUI = GetComponent<FadeUI>();
     }
 
     private void Update()
@@ -29,23 +34,26 @@ public class DialogueManager : MonoBehaviour
         }
     }
 
-    public void StartDialogue(Dialogue dialogue)
+    public void GrabDialogue(Dialogue dialogue)
     {
-        animator.SetBool("IsOpen", true);
-        itemNameText.text = dialogue.itenName;
+        _dialogue = dialogue;
+        _fadeUI.isFadedOut = true;
+        _fadeUI.Fader();
+    }
+
+    public void StartDialogue()
+    {
+        itemNameText.text = _dialogue.itenName;
         sentences.Clear();
 
-        foreach (string sentence in dialogue.sentences)
+        foreach (string s in _dialogue.sentences)
         {
-            sentences.Enqueue(sentence);
+            sentences.Enqueue(s);
         }
 
         DisplayNextSentence();
-        SoundManager.instance.PlayVoiceOverSound(dialogue.audioClips[index]);
     }
 
-    // figure out how to increase the dialogue index when DisplayNextSentence is called
-    // look into unity event system 
     
     public void DisplayNextSentence()
     {
@@ -55,27 +63,41 @@ public class DialogueManager : MonoBehaviour
                 return;
             }
 
-            string sentence = sentences.Dequeue();
-            StopAllCoroutines();
-            StartCoroutine(TypeSentece(sentence));
+        string singleSentence = sentences.Dequeue();
+        PlayAudio();
+        PlayDialogue(singleSentence);
+    }
 
+    private void PlayAudio()
+    {
         SoundManager.instance._voiceOverSource.Stop();
+
+        if (index > _dialogue.audioClips.Length)
+        {
+            return;
+        }
+        else
+        {
+            SoundManager.instance.PlayVoiceOverSound(_dialogue.audioClips[index]);
+            index++;
+        }
 
     }
 
-    IEnumerator TypeSentece(string sentence)
+    private Coroutine typeRoutine = null;
+    void PlayDialogue(string message)
     {
-        dialogueText.text = "";
-        foreach (char letter in sentence.ToCharArray())
-        {
-            dialogueText.text += letter;
-            yield return new WaitForSeconds(typeSpeed);
-        }
+        this.EnsureCoroutineStopped(ref typeRoutine);
+        dialogueVertexAnimator.textAnimating = false;
+        List<DialogueCommand> commands = DialogueUtility.ProcessInputString(message, out string totalTextMessage);
+        typeRoutine = StartCoroutine(dialogueVertexAnimator.AnimateTextIn(commands, totalTextMessage, null));
     }
 
     void EndDialogue()
     {
-        animator.SetBool("IsOpen", false);
+        SoundManager.instance._voiceOverSource.Stop();
         index = 0;
+        _fadeUI.isFadedOut = false;
+        _fadeUI.Fader();
     }
 }
