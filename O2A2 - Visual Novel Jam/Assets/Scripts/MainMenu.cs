@@ -2,12 +2,14 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 
 public class MainMenu : MonoBehaviour
 {
     FadeUI _fadeUI;
     public GameObject buttons;
     public static bool isMainMenuActive = true;
+    public GameObject mainMenuButtons; 
 
     private void Awake()
     {
@@ -24,8 +26,9 @@ public class MainMenu : MonoBehaviour
         _fadeUI.isFadedOut = false;
         _fadeUI.Fader();
         buttons.SetActive(true);
+        mainMenuButtons.GetComponentInChildren<Button>().interactable = false;
         isMainMenuActive = false;
-        Destroy(this, 1.5f);
+        Destroy(this);
     }
 
     public void QuitGame()
