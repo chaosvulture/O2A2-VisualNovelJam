@@ -8,16 +8,18 @@ public class FadeUI : MonoBehaviour
     [SerializeField] private CanvasGroup fadingCanvasGroup;
 
     public bool isFadedOut = true;
+    public float objectAlpha = 1f;
+    public float fadeTime = 2f;
 
     public void Fader()
     {
         if (isFadedOut)
         {
-            fadingCanvasGroup.DOFade(1, 2);
+            fadingCanvasGroup.DOFade(objectAlpha, fadeTime);
         }
         else
         {
-            fadingCanvasGroup.DOFade(0, 2);
+            fadingCanvasGroup.DOFade(-objectAlpha, fadeTime);
         }
     }
 }
