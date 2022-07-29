@@ -7,6 +7,8 @@ public class DialogueManager : MonoBehaviour
 {
     public TextMeshProUGUI itemNameText;
     public TMP_Text textBox;
+    public AudioClip typingClip;
+    public AudioSourceGroup audioSourceGroup;
 
 
     FadeUI _fadeUI;
@@ -21,7 +23,7 @@ public class DialogueManager : MonoBehaviour
 
     private void Awake()
     {
-        dialogueVertexAnimator = new DialogueVertexAnimator(textBox);
+        dialogueVertexAnimator = new DialogueVertexAnimator(textBox, audioSourceGroup);
         sentences = new Queue<string>();
         _fadeUI = GetComponent<FadeUI>();
     }
@@ -64,7 +66,7 @@ public class DialogueManager : MonoBehaviour
             }
 
         string singleSentence = sentences.Dequeue();
-        PlayAudio();
+        //PlayAudio();
         PlayDialogue(singleSentence);
     }
 
@@ -90,12 +92,12 @@ public class DialogueManager : MonoBehaviour
         this.EnsureCoroutineStopped(ref typeRoutine);
         dialogueVertexAnimator.textAnimating = false;
         List<DialogueCommand> commands = DialogueUtility.ProcessInputString(message, out string totalTextMessage);
-        typeRoutine = StartCoroutine(dialogueVertexAnimator.AnimateTextIn(commands, totalTextMessage, null));
+        typeRoutine = StartCoroutine(dialogueVertexAnimator.AnimateTextIn(commands, totalTextMessage, typingClip, null));
     }
 
     void EndDialogue()
     {
-        SoundManager.instance._voiceOverSource.Stop();
+        //SoundManager.instance._voiceOverSource.Stop();
         index = 0;
         _fadeUI.isFadedOut = false;
         _fadeUI.Fader();

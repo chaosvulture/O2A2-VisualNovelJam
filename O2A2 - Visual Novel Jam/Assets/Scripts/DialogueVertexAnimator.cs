@@ -4,21 +4,26 @@ using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 
-public class DialogueVertexAnimator {
+public class DialogueVertexAnimator
+{
     public bool textAnimating = false;
     private bool stopAnimating = false;
 
     private readonly TMP_Text textBox;
     private readonly float textAnimationScale;
-    public DialogueVertexAnimator(TMP_Text _textBox) {
+    private readonly AudioSourceGroup audioSourceGroup;
+    public DialogueVertexAnimator(TMP_Text _textBox, AudioSourceGroup _audioSourceGroup)
+    {
         textBox = _textBox;
+        audioSourceGroup = _audioSourceGroup;
         textAnimationScale = textBox.fontSize;
     }
 
     private static readonly Color32 clear = new Color32(0, 0, 0, 0);
     private const float CHAR_ANIM_TIME = 0.07f;
     private static readonly Vector3 vecZero = Vector3.zero;
-    public IEnumerator AnimateTextIn(List<DialogueCommand> commands, string processedMessage, Action onFinish) {
+    public IEnumerator AnimateTextIn(List<DialogueCommand> commands, string processedMessage, AudioClip voice_sound, Action onFinish)
+    {
         textAnimating = true;
         float secondsPerCharacter = 1f / 150f;
         float timeOfLastCharacter = 0;
@@ -28,8 +33,10 @@ public class DialogueVertexAnimator {
         for (int i = 0; i < textInfo.meshInfo.Length; i++) //Clear the mesh 
         {
             TMP_MeshInfo meshInfer = textInfo.meshInfo[i];
-            if (meshInfer.vertices != null) {
-                for (int j = 0; j < meshInfer.vertices.Length; j++) {
+            if (meshInfer.vertices != null)
+            {
+                for (int j = 0; j < meshInfer.vertices.Length; j++)
+                {
                     meshInfer.vertices[j] = vecZero;
                 }
             }
@@ -40,39 +47,50 @@ public class DialogueVertexAnimator {
 
         TMP_MeshInfo[] cachedMeshInfo = textInfo.CopyMeshInfoVertexData();
         Color32[][] originalColors = new Color32[textInfo.meshInfo.Length][];
-        for (int i = 0; i < originalColors.Length; i++) {
+        for (int i = 0; i < originalColors.Length; i++)
+        {
             Color32[] theColors = textInfo.meshInfo[i].colors32;
             originalColors[i] = new Color32[theColors.Length];
             Array.Copy(theColors, originalColors[i], theColors.Length);
         }
         int charCount = textInfo.characterCount;
         float[] charAnimStartTimes = new float[charCount];
-        for (int i = 0; i < charCount; i++) {
+        for (int i = 0; i < charCount; i++)
+        {
             charAnimStartTimes[i] = -1; //indicate the character as not yet started animating.
         }
         int visableCharacterIndex = 0;
-        while (true) {
-            if (stopAnimating) {
-                for (int i = visableCharacterIndex; i < charCount; i++) {
+        while (true)
+        {
+            if (stopAnimating)
+            {
+                for (int i = visableCharacterIndex; i < charCount; i++)
+                {
                     charAnimStartTimes[i] = Time.unscaledTime;
                 }
                 visableCharacterIndex = charCount;
                 FinishAnimating(onFinish);
             }
-            if (ShouldShowNextCharacter(secondsPerCharacter, timeOfLastCharacter)) {
-                if (visableCharacterIndex <= charCount) {
+            if (ShouldShowNextCharacter(secondsPerCharacter, timeOfLastCharacter))
+            {
+                if (visableCharacterIndex <= charCount)
+                {
                     ExecuteCommandsForCurrentIndex(commands, visableCharacterIndex, ref secondsPerCharacter, ref timeOfLastCharacter);
-                    if (visableCharacterIndex < charCount && ShouldShowNextCharacter(secondsPerCharacter, timeOfLastCharacter)) {
+                    if (visableCharacterIndex < charCount && ShouldShowNextCharacter(secondsPerCharacter, timeOfLastCharacter))
+                    {
                         charAnimStartTimes[visableCharacterIndex] = Time.unscaledTime;
+                        PlayDialogueSound(voice_sound);
                         visableCharacterIndex++;
                         timeOfLastCharacter = Time.unscaledTime;
-                        if (visableCharacterIndex == charCount) {
+                        if (visableCharacterIndex == charCount)
+                        {
                             FinishAnimating(onFinish);
                         }
                     }
                 }
             }
-            for (int j = 0; j < charCount; j++) {
+            for (int j = 0; j < charCount; j++)
+            {
                 TMP_CharacterInfo charInfo = textInfo.characterInfo[j];
                 if (charInfo.isVisible) //Invisible characters have a vertexIndex of 0 because they have no vertices and so they should be ignored to avoid messing up the first character in the string whic also has a vertexIndex of 0
                 {
@@ -89,7 +107,8 @@ public class DialogueVertexAnimator {
                     Vector3[] destinationVertices = textInfo.meshInfo[materialIndex].vertices;
                     float charSize = 0;
                     float charAnimStartTime = charAnimStartTimes[j];
-                    if (charAnimStartTime >= 0) {
+                    if (charAnimStartTime >= 0)
+                    {
                         float timeSinceAnimStart = Time.unscaledTime - charAnimStartTime;
                         charSize = Mathf.Min(1, timeSinceAnimStart / CHAR_ANIM_TIME);
                     }
@@ -103,7 +122,8 @@ public class DialogueVertexAnimator {
                 }
             }
             textBox.UpdateVertexData(TMP_VertexDataUpdateFlags.Colors32);
-            for (int i = 0; i < textInfo.meshInfo.Length; i++) {
+            for (int i = 0; i < textInfo.meshInfo.Length; i++)
+            {
                 TMP_MeshInfo theInfo = textInfo.meshInfo[i];
                 theInfo.mesh.vertices = theInfo.vertices;
                 textBox.UpdateGeometry(theInfo.mesh, i);
@@ -112,11 +132,15 @@ public class DialogueVertexAnimator {
         }
     }
 
-    private void ExecuteCommandsForCurrentIndex(List<DialogueCommand> commands, int visableCharacterIndex, ref float secondsPerCharacter, ref float timeOfLastCharacter) {
-        for (int i = 0; i < commands.Count; i++) {
+    private void ExecuteCommandsForCurrentIndex(List<DialogueCommand> commands, int visableCharacterIndex, ref float secondsPerCharacter, ref float timeOfLastCharacter)
+    {
+        for (int i = 0; i < commands.Count; i++)
+        {
             DialogueCommand command = commands[i];
-            if (command.position == visableCharacterIndex) {
-                switch (command.type) {
+            if (command.position == visableCharacterIndex)
+            {
+                switch (command.type)
+                {
                     case DialogueCommandType.Pause:
                         timeOfLastCharacter = Time.unscaledTime + command.floatValue;
                         break;
@@ -130,7 +154,8 @@ public class DialogueVertexAnimator {
         }
     }
 
-    private void FinishAnimating(Action onFinish) {
+    private void FinishAnimating(Action onFinish)
+    {
         textAnimating = false;
         stopAnimating = false;
         onFinish?.Invoke();
@@ -139,17 +164,23 @@ public class DialogueVertexAnimator {
     private const float NOISE_MAGNITUDE_ADJUSTMENT = 0.06f;
     private const float NOISE_FREQUENCY_ADJUSTMENT = 15f;
     private const float WAVE_MAGNITUDE_ADJUSTMENT = 0.06f;
-    private Vector3 GetAnimPosAdjustment(TextAnimInfo[] textAnimInfo, int charIndex, float fontSize, float time) {
+    private Vector3 GetAnimPosAdjustment(TextAnimInfo[] textAnimInfo, int charIndex, float fontSize, float time)
+    {
         float x = 0;
         float y = 0;
-        for (int i = 0; i < textAnimInfo.Length; i++) {
+        for (int i = 0; i < textAnimInfo.Length; i++)
+        {
             TextAnimInfo info = textAnimInfo[i];
-            if (charIndex >= info.startIndex && charIndex < info.endIndex) {
-                if (info.type == TextAnimationType.shake) {
+            if (charIndex >= info.startIndex && charIndex < info.endIndex)
+            {
+                if (info.type == TextAnimationType.shake)
+                {
                     float scaleAdjust = fontSize * NOISE_MAGNITUDE_ADJUSTMENT;
                     x += (Mathf.PerlinNoise((charIndex + time) * NOISE_FREQUENCY_ADJUSTMENT, 0) - 0.5f) * scaleAdjust;
                     y += (Mathf.PerlinNoise((charIndex + time) * NOISE_FREQUENCY_ADJUSTMENT, 1000) - 0.5f) * scaleAdjust;
-                } else if (info.type == TextAnimationType.wave) {
+                }
+                else if (info.type == TextAnimationType.wave)
+                {
                     y += Mathf.Sin((charIndex * 1.5f) + (time * 6)) * fontSize * WAVE_MAGNITUDE_ADJUSTMENT;
                 }
             }
@@ -157,38 +188,63 @@ public class DialogueVertexAnimator {
         return new Vector3(x, y, 0);
     }
 
-    private static bool ShouldShowNextCharacter(float secondsPerCharacter, float timeOfLastCharacter) {
+    private static bool ShouldShowNextCharacter(float secondsPerCharacter, float timeOfLastCharacter)
+    {
         return (Time.unscaledTime - timeOfLastCharacter) > secondsPerCharacter;
     }
-    public void SkipToEndOfCurrentMessage() {
-        if (textAnimating) {
+    public void SkipToEndOfCurrentMessage()
+    {
+        if (textAnimating)
+        {
             stopAnimating = true;
         }
     }
 
-    private TextAnimInfo[] SeparateOutTextAnimInfo(List<DialogueCommand> commands) {
+    private float timeUntilNextDialogueSound = 0;
+    private float lastDialogueSound = 0;
+    private void PlayDialogueSound(AudioClip voice_sound)
+    {
+        if (Time.unscaledTime - lastDialogueSound > timeUntilNextDialogueSound)
+        {
+            timeUntilNextDialogueSound = UnityEngine.Random.Range(0.02f, 0.08f);
+            lastDialogueSound = Time.unscaledTime;
+            audioSourceGroup.PlayFromNextSource(voice_sound); //Use Multiple Audio Sources to allow playing multiple sounds at once
+        }
+    }
+
+    private TextAnimInfo[] SeparateOutTextAnimInfo(List<DialogueCommand> commands)
+    {
         List<TextAnimInfo> tempResult = new List<TextAnimInfo>();
         List<DialogueCommand> animStartCommands = new List<DialogueCommand>();
         List<DialogueCommand> animEndCommands = new List<DialogueCommand>();
-        for (int i = 0; i < commands.Count; i++) {
+        for (int i = 0; i < commands.Count; i++)
+        {
             DialogueCommand command = commands[i];
-            if (command.type == DialogueCommandType.AnimStart) {
+            if (command.type == DialogueCommandType.AnimStart)
+            {
                 animStartCommands.Add(command);
                 commands.RemoveAt(i);
                 i--;
-            } else if (command.type == DialogueCommandType.AnimEnd) {
+            }
+            else if (command.type == DialogueCommandType.AnimEnd)
+            {
                 animEndCommands.Add(command);
                 commands.RemoveAt(i);
                 i--;
             }
         }
-        if (animStartCommands.Count != animEndCommands.Count) {
+        if (animStartCommands.Count != animEndCommands.Count)
+        {
             Debug.LogError("Unequal number of start and end animation commands. Start Commands: " + animStartCommands.Count + " End Commands: " + animEndCommands.Count);
-        } else {
-            for (int i = 0; i < animStartCommands.Count; i++) {
+        }
+        else
+        {
+            for (int i = 0; i < animStartCommands.Count; i++)
+            {
                 DialogueCommand startCommand = animStartCommands[i];
                 DialogueCommand endCommand = animEndCommands[i];
-                tempResult.Add(new TextAnimInfo {
+                tempResult.Add(new TextAnimInfo
+                {
                     startIndex = startCommand.position,
                     endIndex = endCommand.position,
                     type = startCommand.textAnimValue
@@ -199,7 +255,8 @@ public class DialogueVertexAnimator {
     }
 }
 
-public struct TextAnimInfo {
+public struct TextAnimInfo
+{
     public int startIndex;
     public int endIndex;
     public TextAnimationType type;
