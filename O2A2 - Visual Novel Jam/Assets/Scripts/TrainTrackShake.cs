@@ -9,10 +9,12 @@ public class TrainTrackShake : MonoBehaviour
     public Transform GameObject;
 
     public float speed = 1.0F;
+    public float betweenhops = 1.0F;
     private float startTime;
     private float journeyLength;
 
     private bool _up;
+    private bool isCoroutineExecuting = false;
 
     void Start()
     {
@@ -37,11 +39,15 @@ public class TrainTrackShake : MonoBehaviour
             // Set our position as a fraction of the distance between the markers.
             GameObject.position = Vector3.Lerp(startMarker.position, endMarker.position, fractionOfJourney);
 
-            if (GameObject.position == endMarker.position) { 
+            if (GameObject.position == endMarker.position)
+            {
                 _up = true;
                 startTime = Time.time;
-            } else { return; }
-        } else {
+            }
+            else { return; }
+        }
+        else
+        {
             // Distance moved equals elapsed time times speed..
             float distCovered = (Time.time - startTime) * speed;
 
@@ -51,10 +57,26 @@ public class TrainTrackShake : MonoBehaviour
             // Set our position as a fraction of the distance between the markers.
             GameObject.position = Vector3.Lerp(endMarker.position, startMarker.position, fractionOfJourney);
 
-            if (GameObject.position == startMarker.position) { 
-                _up = false;
-                startTime = Time.time;
-            } else { return; }
+            if (GameObject.position == startMarker.position)
+            {
+                StartCoroutine(ExecuteAfterTime(betweenhops));
+            }
+            else { return; }
         }
+    }
+
+    IEnumerator ExecuteAfterTime(float time)
+    {
+        if (isCoroutineExecuting)
+            yield break;
+
+        isCoroutineExecuting = true;
+
+        yield return new WaitForSeconds(time);
+
+        _up = false;
+        startTime = Time.time;
+
+        isCoroutineExecuting = false;
     }
 }
