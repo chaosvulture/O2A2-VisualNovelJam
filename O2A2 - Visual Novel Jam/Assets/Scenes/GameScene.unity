@@ -16723,7 +16723,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   itemNameText: {fileID: 1528197571}
   textBox: {fileID: 1952841029}
-  typingClip: {fileID: 8300000, guid: 816ffca42227c8644896b8dea841a7aa, type: 3}
+  typingClip: {fileID: 8300000, guid: 9af7db2a1539d3642a26007b11b1607a, type: 3}
   audioSourceGroup: {fileID: 1390190405}
   _buttons: {fileID: 1121592447}
   delay: 2
