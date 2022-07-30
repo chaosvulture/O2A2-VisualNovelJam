@@ -27,8 +27,6 @@ public class CinematicBars : MonoBehaviour
         bottomBar.anchorMin = new Vector2(0, 0);
         bottomBar.anchorMax = new Vector2(1, 0);
         bottomBar.sizeDelta = new Vector2(0, 0);
-
-        Show(300, 3);
     }
 
     private void Update()

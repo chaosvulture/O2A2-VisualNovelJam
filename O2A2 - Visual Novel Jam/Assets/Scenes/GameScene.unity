@@ -45420,7 +45420,7 @@ GameObject:
   - component: {fileID: 1695045299}
   - component: {fileID: 1695045298}
   m_Layer: 5
-  m_Name: Canvas
+  m_Name: CinematicCanvas
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -59852,6 +59852,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   buttons: {fileID: 1121592447}
   mainMenuButtons: {fileID: 722864941}
+  delay: 3
 --- !u!114 &1967097267
 MonoBehaviour:
   m_ObjectHideFlags: 0

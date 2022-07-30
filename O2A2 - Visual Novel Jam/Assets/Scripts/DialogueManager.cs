@@ -121,14 +121,15 @@ public class DialogueManager : MonoBehaviour
         _fadeUI.Fader();
         isDialogueBeingDisplayed = false;
         _buttons.SetActive(true);
+        FindObjectOfType<CinematicBars>().Hide(2);
         
         if (!isEndTriggered)
         {
             FinalDialogue();
         }
-        
-        if (isEndTriggered)
+        else if (isEndTriggered)
         {
+            FindObjectOfType<CinematicBars>().Show(1500, 2);
             _buttons.SetActive(false);
         }
 
@@ -136,6 +137,7 @@ public class DialogueManager : MonoBehaviour
 
     IEnumerator TriggerEndDialogue()
     {
+        FindObjectOfType<CinematicBars>().Show(300, 2);
         yield return new WaitForSeconds(delay);
         GetComponent<DialogueTrigger>().TriggerDialogue();
     }
