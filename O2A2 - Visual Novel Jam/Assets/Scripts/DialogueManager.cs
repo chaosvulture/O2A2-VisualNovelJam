@@ -11,6 +11,7 @@ public class DialogueManager : MonoBehaviour
     public AudioSourceGroup audioSourceGroup;
     public GameObject _buttons;
     public float delay = 2f;
+    public static bool isDialogueBeingDisplayed = false;
 
     private int numberOfTrueBoleans = 0;
 
@@ -22,7 +23,7 @@ public class DialogueManager : MonoBehaviour
 
     private bool isEndTriggered = false;
 
-    private bool isDialogueBeingDisplayed = false;
+    
 
     private Queue<string> sentences;
 
@@ -141,7 +142,7 @@ public class DialogueManager : MonoBehaviour
 
     void FinalDialogue()
     {
-        if (numberOfTrueBoleans >= 3)
+        if (numberOfTrueBoleans >= 15)
         {
             Debug.Log("Endgame");
             _buttons.SetActive(false);
