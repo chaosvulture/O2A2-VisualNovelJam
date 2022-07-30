@@ -10,6 +10,7 @@ public class DialogueManager : MonoBehaviour
     public AudioClip typingClip;
     public AudioSourceGroup audioSourceGroup;
     public GameObject _buttons;
+    public float delay = 2f;
 
     private int numberOfTrueBoleans = 0;
 
@@ -18,6 +19,8 @@ public class DialogueManager : MonoBehaviour
     int index = 0;
 
     private Dialogue _dialogue;
+
+    private bool isEndTriggered = false;
 
     private bool isDialogueBeingDisplayed = false;
 
@@ -56,8 +59,6 @@ public class DialogueManager : MonoBehaviour
 
     public void StartDialogue()
     {
-        if (numberOfTrueBoleans <= 2)
-        {
             itemNameText.text = _dialogue.itenName;
             sentences.Clear();
 
@@ -69,7 +70,6 @@ public class DialogueManager : MonoBehaviour
             }
 
             DisplayNextSentence();
-        }
 
     }
 
@@ -118,7 +118,35 @@ public class DialogueManager : MonoBehaviour
         index = 0;
         _fadeUI.isFadedOut = false;
         _fadeUI.Fader();
-        _buttons.SetActive(true);
         isDialogueBeingDisplayed = false;
+        _buttons.SetActive(true);
+        
+        if (!isEndTriggered)
+        {
+            FinalDialogue();
+        }
+        
+        if (isEndTriggered)
+        {
+            _buttons.SetActive(false);
+        }
+
+    }
+
+    IEnumerator TriggerEndDialogue()
+    {
+        yield return new WaitForSeconds(delay);
+        GetComponent<DialogueTrigger>().TriggerDialogue();
+    }
+
+    void FinalDialogue()
+    {
+        if (numberOfTrueBoleans >= 3)
+        {
+            Debug.Log("Endgame");
+            _buttons.SetActive(false);
+            StartCoroutine(TriggerEndDialogue());
+            isEndTriggered = true;
+        }
     }
 }
