@@ -7,6 +7,7 @@ public class DialogueTrigger : MonoBehaviour
 {
     public Dialogue dialogue;
     private DialogueManager dialogueManager;
+    public bool iwasActivated = false;
 
     private void Awake()
     {
@@ -18,6 +19,11 @@ public class DialogueTrigger : MonoBehaviour
     {
         dialogueManager.GrabDialogue(dialogue);
         dialogueManager.StartDialogue();
+        if (iwasActivated == false)
+        {
+            iwasActivated = true;
+        }
+
     }
 
 
