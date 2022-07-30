@@ -9,14 +9,16 @@ public class DialogueManager : MonoBehaviour
     public TMP_Text textBox;
     public AudioClip typingClip;
     public AudioSourceGroup audioSourceGroup;
-
+    public GameObject _buttons;
 
     FadeUI _fadeUI;
 
     int index = 0;
 
     private Dialogue _dialogue;
-    
+
+    private bool isDialogueBeingDisplayed = false;
+
     private Queue<string> sentences;
 
     private DialogueVertexAnimator dialogueVertexAnimator;
@@ -30,7 +32,7 @@ public class DialogueManager : MonoBehaviour
 
     private void Update()
     {
-        if (Input.GetMouseButtonDown(0))
+        if (Input.GetMouseButtonDown(0) && isDialogueBeingDisplayed)
         {
             DisplayNextSentence();
         }
@@ -48,10 +50,14 @@ public class DialogueManager : MonoBehaviour
         itemNameText.text = _dialogue.itenName;
         sentences.Clear();
 
+        isDialogueBeingDisplayed = true;
+
         foreach (string s in _dialogue.sentences)
         {
             sentences.Enqueue(s);
         }
+        
+        _buttons.SetActive(false);
 
         DisplayNextSentence();
     }
@@ -101,5 +107,7 @@ public class DialogueManager : MonoBehaviour
         index = 0;
         _fadeUI.isFadedOut = false;
         _fadeUI.Fader();
+        _buttons.SetActive(true);
+        isDialogueBeingDisplayed = false;
     }
 }
