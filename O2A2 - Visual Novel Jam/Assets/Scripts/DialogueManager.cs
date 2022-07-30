@@ -137,6 +137,7 @@ public class DialogueManager : MonoBehaviour
         {
             _buttons.SetActive(false);
             FindObjectOfType<CinematicBars>().Show(2000, 5);
+            StartCoroutine(LoadNextScene());
         }    
 
     }
@@ -148,9 +149,15 @@ public class DialogueManager : MonoBehaviour
         GetComponent<DialogueTrigger>().TriggerDialogue();
     }
 
+    IEnumerator LoadNextScene()
+    {
+        yield return new WaitForSeconds(5.5f);
+        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex + 1);
+    }
+
     void FinalDialogue()
     {
-        if (numberOfTrueBoleans >= 15)
+        if (numberOfTrueBoleans >= 2)
         {
             Debug.Log("Endgame");
             _buttons.SetActive(false);
