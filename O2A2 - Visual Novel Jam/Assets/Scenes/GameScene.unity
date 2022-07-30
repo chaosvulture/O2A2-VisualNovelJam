@@ -7321,7 +7321,7 @@ PrefabInstance:
     - target: {fileID: 7695420702090891372, guid: 2b8b482e401b54b4f9d10d22f02bda32, type: 3}
       propertyPath: dialogue.sentences.Array.data[0]
       value: "It\u2019s a good piece. A shame really, it broke a while ago, and I
-        can\u2019t seem to find someone that can fix it"
+        can\u2019t seem to find someone that can fix it."
       objectReference: {fileID: 0}
     - target: {fileID: 7695420702090891372, guid: 2b8b482e401b54b4f9d10d22f02bda32, type: 3}
       propertyPath: dialogue.sentences.Array.data[1]
