@@ -11,8 +11,6 @@ public class DialogueManager : MonoBehaviour
     public AudioSourceGroup audioSourceGroup;
     public GameObject _buttons;
 
-    public DialogueTrigger[] dialogueTriggers;
-
     private int numberOfTrueBoleans = 0;
 
     FadeUI _fadeUI;
@@ -45,8 +43,15 @@ public class DialogueManager : MonoBehaviour
     public void GrabDialogue(Dialogue dialogue)
     {
         _dialogue = dialogue;
+        _buttons.SetActive(false);
         _fadeUI.isFadedOut = true;
         _fadeUI.Fader();
+    }
+
+    public void CalculateBools()
+    {
+        numberOfTrueBoleans++;
+        Debug.Log(numberOfTrueBoleans);
     }
 
     public void StartDialogue()
@@ -63,10 +68,7 @@ public class DialogueManager : MonoBehaviour
                 sentences.Enqueue(s);
             }
 
-            _buttons.SetActive(false);
-
             DisplayNextSentence();
-            CheckIfBoolIsTrue();
         }
 
     }
@@ -108,18 +110,6 @@ public class DialogueManager : MonoBehaviour
         dialogueVertexAnimator.textAnimating = false;
         List<DialogueCommand> commands = DialogueUtility.ProcessInputString(message, out string totalTextMessage);
         typeRoutine = StartCoroutine(dialogueVertexAnimator.AnimateTextIn(commands, totalTextMessage, typingClip, null));
-    }
-
-    private void CheckIfBoolIsTrue()
-    {
-        for (int i = 0; i < dialogueTriggers.Length; i++)
-        {
-            if (dialogueTriggers[i].iwasActivated == true)
-            {
-                numberOfTrueBoleans++;
-                Debug.Log(numberOfTrueBoleans);
-            }
-        }
     }
 
     void EndDialogue()

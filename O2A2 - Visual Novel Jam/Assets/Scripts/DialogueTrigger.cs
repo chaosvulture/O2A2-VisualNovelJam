@@ -19,11 +19,11 @@ public class DialogueTrigger : MonoBehaviour
     {
         dialogueManager.GrabDialogue(dialogue);
         dialogueManager.StartDialogue();
-        if (iwasActivated == false)
+        if (!iwasActivated)
         {
             iwasActivated = true;
+            dialogueManager.CalculateBools();
         }
-
     }
 
 
