@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
+using UnityEngine.SceneManagement;
 
 public class DialogueManager : MonoBehaviour
 {
@@ -14,6 +15,7 @@ public class DialogueManager : MonoBehaviour
     public static bool isDialogueBeingDisplayed = false;
 
     private int numberOfTrueBoleans = 0;
+    private bool timeForCinematicBars = false;
 
     FadeUI _fadeUI;
 
@@ -121,7 +123,11 @@ public class DialogueManager : MonoBehaviour
         _fadeUI.Fader();
         isDialogueBeingDisplayed = false;
         _buttons.SetActive(true);
-        FindObjectOfType<CinematicBars>().Hide(2);
+
+        if (!timeForCinematicBars)
+        {
+            FindObjectOfType<CinematicBars>().Hide(2);
+        }
         
         if (!isEndTriggered)
         {
@@ -129,9 +135,9 @@ public class DialogueManager : MonoBehaviour
         }
         else if (isEndTriggered)
         {
-            FindObjectOfType<CinematicBars>().Show(1500, 2);
             _buttons.SetActive(false);
-        }
+            FindObjectOfType<CinematicBars>().Show(2000, 5);
+        }    
 
     }
 
@@ -150,6 +156,7 @@ public class DialogueManager : MonoBehaviour
             _buttons.SetActive(false);
             StartCoroutine(TriggerEndDialogue());
             isEndTriggered = true;
+            timeForCinematicBars = true; 
         }
     }
 }
