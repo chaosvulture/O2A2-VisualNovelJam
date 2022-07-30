@@ -157,7 +157,7 @@ public class DialogueManager : MonoBehaviour
 
     void FinalDialogue()
     {
-        if (numberOfTrueBoleans >= 2)
+        if (numberOfTrueBoleans >= 15)
         {
             Debug.Log("Endgame");
             _buttons.SetActive(false);
