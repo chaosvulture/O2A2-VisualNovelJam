@@ -7,7 +7,7 @@ public class AudioSourceGroup : MonoBehaviour
 
     private void Awake()
     {
-            DontDestroyOnLoad(gameObject);
+        DontDestroyOnLoad(gameObject);
     }
 
     public void PlayFromNextSource(AudioClip clip) {
